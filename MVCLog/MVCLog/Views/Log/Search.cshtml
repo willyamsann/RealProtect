@@ -1,0 +1,184 @@
+﻿@model IEnumerable<MVCLog.Models.LogViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+
+
+<script>
+    $(document).ready(function () {
+        $('#example').dataTable();
+    });
+
+</script>
+<h1>Tela de Logs com Pesquisa</h1>
+<a href="/log" class="btn btn-primary" >
+    Voltar
+</a>
+<h4> Total de Logs pesquisado: @ViewBag.Total</h4>
+
+<input class="form-control" id="myInput" type="text" placeholder="Search..">
+<br />
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ip)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ip)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+<br />
+@using (Html.BeginForm("Index", "Log", FormMethod.Post))
+{
+    <div class="row">
+        @{
+            if ((int)ViewData["pagina"] <= 4)
+            {
+
+                var pageNum = 5;
+                if ((int)ViewData["qtdPagina"] > 0 && (int)ViewData["qtdPagina"] < 5)
+                {
+                    pageNum = (int)ViewData["qtdPagina"];
+                }
+                <button type="submit" name="page" value="1" class="btn btn-light" href="#">Primeiro</button>
+
+                for (int pages = 1; pages <= pageNum; pages++)
+                {
+                    if (pages == (int)ViewData["pagina"])
+                    {
+                        <button type="submit" name="page" value="@pages" href="#" class="active">@pages</button>
+                    }
+                    else
+                    {
+                        <button type="submit" name="page" value="@pages" class="btn btn-light" href="#">@pages</button>
+                    }
+                }
+                <button type="submit" name="page" value="@ViewData["qtdPagina"]" class="btn btn-light" href="#">Último</button>
+
+            }
+            else
+            {
+                var num1 = 4;
+                var num2 = 0;
+                if ((int)ViewData["qtdPagina"] != (int)ViewData["pagina"])
+                {
+                    num1 = 3;
+                    num2 = 1;
+                }
+                var pageinitial = (int)ViewData["pagina"] - num1;
+                var pageFinal = (int)ViewData["pagina"] + num2;
+
+
+                <button type="submit" name="page" value="1" class="btn btn-light" href="#">Primeiro</button>
+
+                for (int pages = pageinitial; pages <= pageFinal; pages++)
+                {
+                    if (pages == (int)ViewData["pagina"])
+                    {
+                        <button type="submit" name="page" value="@pages" href="#" class="active">@pages</button>
+                    }
+                    else
+                    {
+                        <button type="submit" name="page" value="@pages" class="btn btn-light" href="#">@pages</button>
+                    }
+                }
+                <button type="submit" name="page" value="@ViewData["qtdPagina"]" class="btn btn-light" href="#">Último</button>
+            }
+        }
+    </div>
+}
+<br />
+<br /><div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Filtro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Id</h5>
+                <input name="id" id="id" class="form-control" />
+                <br />
+                <h5>Descrição</h5>
+                <p>Você pode colocar algum trecho da descrição ou palavra</p>
+                <input name="id" id="id" class="form-control" />
+                <br />
+                <h5>Ip</h5>
+                <input name="ip" id="ip" class="form-control" />
+                <h5>Data inicio</h5>
+                <input type="date" name="initial" id="initial" class="form-control" />
+                <br />
+                <h5>Data Final</h5>
+                <input type="date" name="final" id="final" class="form-control" />
+                <br />
+                <br />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary">Pesquisar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#myModal').on('shown.bs.modal', function () {
+        $('#myInput').trigger('focus')
+    })
+</script>
+<script>
+    $(document).ready(function () {
+        $("#myInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+</script>
